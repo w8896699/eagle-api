@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Mixed = mongoose.Schema.Types.Mixed;
 
-module.exports = require('../models')('CommentPeriod', {
+var definition = {
     additionalText       : { type: String, default: '' },
     ceaaAdditionalText   : { type: String, default: '' },
     ceaaInformationLabel : { type: String, default: '' },
@@ -15,9 +15,10 @@ module.exports = require('../models')('CommentPeriod', {
     dateStarted          : { type: Date, default: '' },
     dateStartedEst       : { type: Date, default: '' },
     dateUpdated          : { type: Date, default: '' },
+    description          : [{ type: String, default: '' }],
     downloadRoles        : [{ type: String, default: '' }],
     informationLabel     : { type: String, default: '' },
-    instructions         : { type: String, default: '' },
+    informationForComment: { type: String, default: '' },
     isClassified         : { type: Boolean, default: '' },
     isPublished          : { type: Boolean, default: '' },
     isResolved           : { type: Boolean, default: '' },
@@ -42,4 +43,19 @@ module.exports = require('../models')('CommentPeriod', {
     read                : [{ type: String, trim: true, default: 'sysadmin' }],
     write               : [{ type: String, trim: true, default: 'sysadmin' }],
     delete              : [{ type: String, trim: true, default: 'sysadmin' }]
-}, 'epic');
+};
+
+// define a new mongoose virtual called nature as a basic object 
+// with a name field, and getter and setter functions
+var instructions = {};
+instructions.name = 'instructions';
+instructions.get = function () {
+  if (!(this.informationForComment)) return "";
+//   this.commentPeriod.instructions += ` for ${this.currentProject.name} Project.`; 
+// TODO: add in the project name
+  return `Comment Period on the ${this.informationForComment} for REPLACE_ME Project.  ${this.description}`;
+};
+
+definition.virtuals__ = [instructions];
+
+module.exports = require ('../models')('CommentPeriod', definition, 'epic');
