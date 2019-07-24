@@ -45,17 +45,17 @@ var definition = {
     delete              : [{ type: String, trim: true, default: 'sysadmin' }]
 };
 
-// define a new mongoose virtual called nature as a basic object 
-// with a name field, and getter and setter functions
-var instructions = {};
-instructions.name = 'instructions';
-instructions.get = function () {
-  if (!(this.informationForComment)) return "";
-//   this.commentPeriod.instructions += ` for ${this.currentProject.name} Project.`; 
-// TODO: add in the project name
-  return `Comment Period on the ${this.informationForComment} for REPLACE_ME Project.  ${this.description}`;
-};
-
-definition.virtuals__ = [instructions];
+// // define a new mongoose virtual called nature as a basic object 
+// // with a name field, and getter and setter functions
+// var instructions = {};
+// instructions.name = 'instructions';
+// instructions.get = function () {
+//   if (!(this.informationForComment)) return "";
+// //   this.commentPeriod.instructions += ` for ${this.currentProject.name} Project.`; 
+// // TODO: add in the project name
+//   return `Comment Period on the ${this.informationForComment} for REPLACE_ME Project.  ${this.description}`;
+// };
+//db.epic.find({_id: ObjectId("58851016aaecd9001b80ae58")},{"name":1,_id:0})
+// definition.virtuals__ = [instructions];
 
 module.exports = require ('../models')('CommentPeriod', definition, 'epic');
