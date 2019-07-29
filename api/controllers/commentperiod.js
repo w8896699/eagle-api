@@ -27,6 +27,7 @@ var getSanitizedFields = function (fields) {
       'informationLabel',
       'informationForComment',
       'instructions',
+      'instruction',
       'isClassified',
       'isPublished',
       'isResolved',
@@ -274,7 +275,7 @@ exports.protectedPost = async function (args, res, next) {
   defaultLog.info('Incoming new comment period:', obj);
 
   var CommentPeriod = mongoose.model('CommentPeriod');
-
+  console.log('hahaa',obj);
   var commentPeriod = new CommentPeriod({
     _schemaName: 'CommentPeriod',
     addedBy: args.swagger.params.auth_payload.preferred_username,
@@ -282,7 +283,6 @@ exports.protectedPost = async function (args, res, next) {
     dateAdded: new Date(),
     dateCompleted: obj.dateCompleted,
     dateStarted: obj.dateStarted,
-    instructions: obj.instructions,
     description: obj.description,
     informationForComment: obj.informationForComment,
     milestone: mongoose.Types.ObjectId(obj.milestone),
@@ -293,13 +293,14 @@ exports.protectedPost = async function (args, res, next) {
     write: ['staff', 'sysadmin'],
     delete: ['staff', 'sysadmin']
   });
-
+  console.log('I am here',commentPeriod);
   if (obj.isPublished) {
     commentPeriod.read.push('public');
   }
 
   try {
     var cp = await commentPeriod.save();
+    console.log('cp is',cp);
     Utils.recordAction('put', 'commentPeriod', args.swagger.params.auth_payload.preferred_username, cp._id);
     defaultLog.info('Saved new comment period object:', cp);
     return Actions.sendResponse(res, 200, cp);
@@ -322,7 +323,6 @@ exports.protectedPut = async function (args, res, next) {
     dateStarted: obj.dateStarted,
     dateUpdated: new Date(),
     description: obj.description,
-    instructions: obj.instructions,
     informationForComment: obj.informationForComment,
     milestone: mongoose.Types.ObjectId(obj.milestone),
     openHouses: obj.openHouses,
@@ -330,7 +330,7 @@ exports.protectedPut = async function (args, res, next) {
     updatedBy: args.swagger.params.auth_payload.preferred_username,
     read: ['staff', 'sysadmin']
   };
-
+ 
   if (obj.isPublished) {
     commentPeriod.read.push('public');
   }

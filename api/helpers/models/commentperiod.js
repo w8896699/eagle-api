@@ -1,3 +1,4 @@
+// var makeInstructions = require('@bit/eao.epic.comment-period-business-logic');
 var mongoose = require('mongoose');
 var Mixed = mongoose.Schema.Types.Mixed;
 
@@ -15,10 +16,11 @@ var definition = {
     dateStarted          : { type: Date, default: '' },
     dateStartedEst       : { type: Date, default: '' },
     dateUpdated          : { type: Date, default: '' },
-    description          : [{ type: String, default: '' }],
+    description          : { type: String, default: '' },
     downloadRoles        : [{ type: String, default: '' }],
     informationLabel     : { type: String, default: '' },
     informationForComment: { type: String, default: '' },
+    instructions         : { type: String, default: ''  },
     isClassified         : { type: Boolean, default: '' },
     isPublished          : { type: Boolean, default: '' },
     isResolved           : { type: Boolean, default: '' },
@@ -44,18 +46,24 @@ var definition = {
     write               : [{ type: String, trim: true, default: 'sysadmin' }],
     delete              : [{ type: String, trim: true, default: 'sysadmin' }]
 };
+var instruction = {};
+instruction.name = 'instruction';
+instruction.get = function () {
+        // var instruction = makeInstructions.combineText(this.informationForComment, this.description,this.project);
+// todo add in the project name;
+        var textInfo = 'Comment Period on the '+ this.informationForComment + ' for ' + this.project + '.' + '\n' + this.description;
+        console.log('babababababababa', textInfo);
+        return textInfo;
+        };
+// instruction.set = function (instruction) {
+//     try {
+//         this.set('build', (_.invert(buildToNature))[nature]);
+//     } catch (error) {
+//         console.log('Failed to parse nature: "' + nature + '" with error: "' + error + '"')
+//         this.set('build', null);
+//     }
+//     };
 
-// // define a new mongoose virtual called nature as a basic object 
-// // with a name field, and getter and setter functions
-// var instructions = {};
-// instructions.name = 'instructions';
-// instructions.get = function () {
-//   if (!(this.informationForComment)) return "";
-// //   this.commentPeriod.instructions += ` for ${this.currentProject.name} Project.`; 
-// // TODO: add in the project name
-//   return `Comment Period on the ${this.informationForComment} for REPLACE_ME Project.  ${this.description}`;
-// };
-//db.epic.find({_id: ObjectId("58851016aaecd9001b80ae58")},{"name":1,_id:0})
-// definition.virtuals__ = [instructions];
+definition.virtuals__ = [instruction];
 
 module.exports = require ('../models')('CommentPeriod', definition, 'epic');
