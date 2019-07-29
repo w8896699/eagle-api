@@ -20,7 +20,6 @@ var definition = {
     downloadRoles        : [{ type: String, default: '' }],
     informationLabel     : { type: String, default: '' },
     informationForComment: { type: String, default: '' },
-    instructions         : { type: String, default: ''  },
     isClassified         : { type: Boolean, default: '' },
     isPublished          : { type: Boolean, default: '' },
     isResolved           : { type: Boolean, default: '' },
@@ -50,19 +49,14 @@ var instruction = {};
 instruction.name = 'instruction';
 instruction.get = function () {
         // var instruction = makeInstructions.combineText(this.informationForComment, this.description,this.project);
-// todo add in the project name;
-        var textInfo = 'Comment Period on the '+ this.informationForComment + ' for ' + this.project + '.' + '\n' + this.description;
-        console.log('babababababababa', textInfo);
-        return textInfo;
+        // todo add in the project name;
+        this.textInfo = 'Comment Period on the '+ this.informationForComment + ' for ' + this.project + '.' + '\n' + this.description;
+        console.log('babababababababa', this.textInfo);
+        return this.textInfo;
         };
-// instruction.set = function (instruction) {
-//     try {
-//         this.set('build', (_.invert(buildToNature))[nature]);
-//     } catch (error) {
-//         console.log('Failed to parse nature: "' + nature + '" with error: "' + error + '"')
-//         this.set('build', null);
-//     }
-//     };
+instruction.set = function (instruction) {
+        this.set(instruction);
+    };
 
 definition.virtuals__ = [instruction];
 
