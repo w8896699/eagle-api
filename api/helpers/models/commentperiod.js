@@ -19,6 +19,7 @@ var definition = {
     description          : { type: String, default: '' },
     downloadRoles        : [{ type: String, default: '' }],
     informationLabel     : { type: String, default: '' },
+    instructions         : { type: String, default: '' },
     informationForComment: { type: String, default: '' },
     isClassified         : { type: Boolean, default: '' },
     isPublished          : { type: Boolean, default: '' },
@@ -45,19 +46,4 @@ var definition = {
     write               : [{ type: String, trim: true, default: 'sysadmin' }],
     delete              : [{ type: String, trim: true, default: 'sysadmin' }]
 };
-var instruction = {};
-instruction.name = 'instruction';
-instruction.get = function () {
-        // var instruction = makeInstructions.combineText(this.informationForComment, this.description,this.project);
-        // todo add in the project name;
-        this.textInfo = 'Comment Period on the '+ this.informationForComment + ' for ' + this.project + '.' + '\n' + this.description;
-        console.log('babababababababa', this.textInfo);
-        return this.textInfo;
-        };
-instruction.set = function (instruction) {
-        this.set(instruction);
-    };
-
-definition.virtuals__ = [instruction];
-
 module.exports = require ('../models')('CommentPeriod', definition, 'epic');

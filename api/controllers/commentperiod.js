@@ -27,7 +27,6 @@ var getSanitizedFields = function (fields) {
       'informationLabel',
       'informationForComment',
       'instructions',
-      'instruction',
       'isClassified',
       'isPublished',
       'isResolved',
@@ -275,7 +274,6 @@ exports.protectedPost = async function (args, res, next) {
   defaultLog.info('Incoming new comment period:', obj);
 
   var CommentPeriod = mongoose.model('CommentPeriod');
-  console.log('hahaa',obj);
   var commentPeriod = new CommentPeriod({
     _schemaName: 'CommentPeriod',
     addedBy: args.swagger.params.auth_payload.preferred_username,
@@ -285,6 +283,7 @@ exports.protectedPost = async function (args, res, next) {
     dateStarted: obj.dateStarted,
     description: obj.description,
     informationForComment: obj.informationForComment,
+    instructions: obj.instructions,
     milestone: mongoose.Types.ObjectId(obj.milestone),
     openHouses: obj.openHouses,
     relatedDocuments: obj.relatedDocuments,
@@ -293,14 +292,12 @@ exports.protectedPost = async function (args, res, next) {
     write: ['staff', 'sysadmin'],
     delete: ['staff', 'sysadmin']
   });
-  console.log('I am here',commentPeriod);
   if (obj.isPublished) {
     commentPeriod.read.push('public');
   }
 
   try {
     var cp = await commentPeriod.save();
-    console.log('cp is',cp);
     Utils.recordAction('put', 'commentPeriod', args.swagger.params.auth_payload.preferred_username, cp._id);
     defaultLog.info('Saved new comment period object:', cp);
     return Actions.sendResponse(res, 200, cp);
@@ -325,6 +322,7 @@ exports.protectedPut = async function (args, res, next) {
     description: obj.description,
     informationForComment: obj.informationForComment,
     milestone: mongoose.Types.ObjectId(obj.milestone),
+    instructions: obj.instructions,
     openHouses: obj.openHouses,
     relatedDocuments: obj.relatedDocuments,
     updatedBy: args.swagger.params.auth_payload.preferred_username,
