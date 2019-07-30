@@ -25,6 +25,8 @@ var generateExpArray = async function (field, roles) {
       console.log("item:", item, queryString[item]);
       if (item === 'pcp') {
         await handlePCPItem(roles, expArray, queryString[item]);
+      } else if (item === 'decisionDateStart' || item === 'decisionDateEnd') {
+        handleDateItem(expArray, item, queryString[item]);
       } else if (Array.isArray(queryString[item])) {
         // Arrays are a list of options so will always be ors
         var orArray = [];
@@ -63,12 +65,12 @@ var getConvertedValue = function (item, entry) {
       return { [item]: entry };
     }
   } else {
-      console.log("number");
-      return { [item]: parseInt(entry) };
+    console.log("number");
+    return { [item]: parseInt(entry) };
   }
 }
 
-var handlePCPItem = async function(roles, expArray, value) {
+var handlePCPItem = async function (roles, expArray, value) {
   if (Array.isArray(value)) {
     // Arrays are a list of options so will always be ors
     var orArray = [];
@@ -81,7 +83,7 @@ var handlePCPItem = async function(roles, expArray, value) {
   }
 }
 
-var getPCPValue = async function(roles, entry) {
+var getPCPValue = async function (roles, entry) {
   console.log('pcp: ', entry);
 
   var query = null;
@@ -95,8 +97,8 @@ var getPCPValue = async function(roles, entry) {
       query = {
         _schemaName: 'CommentPeriod',
         $and: [
-          { dateStarted: { $gt: now }},
-          { dateStarted: { $lte: in7days }}
+          { dateStarted: { $gt: now } },
+          { dateStarted: { $lte: in7days } }
         ]
       };
       break;
@@ -105,8 +107,8 @@ var getPCPValue = async function(roles, entry) {
       query = {
         _schemaName: 'CommentPeriod',
         $and: [
-          { dateStarted: { $lte: now }},
-          { dateCompleted: { $gt: now }}
+          { dateStarted: { $lte: now } },
+          { dateCompleted: { $gt: now } }
         ]
       };
       break;
@@ -127,11 +129,26 @@ var getPCPValue = async function(roles, entry) {
   if (query) {
     var data = await Utils.runDataQuery('CommentPeriod', roles, query, ['project'], null, null, null, null, false, null);
     var ids = _.map(data, 'project');
-    pcp = { _id: { $in: ids }};
+    pcp = { _id: { $in: ids } };
   }
 
   console.log('pcp', pcp);
   return pcp;
+}
+
+var handleDateItem = function(expArray, item, entry) {
+  var date = new Date(entry);
+
+  // Validate: valid date?
+  if (!isNaN(date)) {
+    if (item === 'decisionDateStart') {
+      var start = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      expArray.push({ decisionDate: { $gte: start } });
+    } else if (item === 'decisionDateEnd') {
+      var end = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1);
+      expArray.push({ decisionDate: { $lt: end } });
+    }
+  }
 }
 
 var searchCollection = async function (roles, keywords, collection, pageNum, pageSize, project, sortField, sortDirection, caseSensitive, populate = false, and, or) {
@@ -156,7 +173,7 @@ var searchCollection = async function (roles, keywords, collection, pageNum, pag
   if (andExpArray.length > 0 && orExpArray.length > 0) {
     modifier = { $and: [{ $and: andExpArray }, { $and: orExpArray }] };
   } else if (andExpArray.length === 0 && orExpArray.length > 0) {
-    modifier = { $and: orExpArray  };
+    modifier = { $and: orExpArray };
   } else if (andExpArray.length > 0 && orExpArray.length === 0) {
     modifier = { $and: andExpArray };
   }
@@ -406,7 +423,7 @@ var executeQuery = async function (args, res, next) {
   console.log(roles);
   console.log("******************************************************************");
 
-  Utils.recordAction('search', keywords, args.swagger.params.auth_payload ? args.swagger.params.auth_payload.preferred_username : 'public')
+  Utils.recordAction('Search', keywords, args.swagger.params.auth_payload ? args.swagger.params.auth_payload.preferred_username : 'public')
 
   var sortDirection = undefined;
   var sortField = undefined;
